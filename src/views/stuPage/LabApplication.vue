@@ -109,7 +109,7 @@
 
         <el-table-column prop="addr" label="操作" align="center">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.row)"
+            <el-button size="mini" @click="handleEdit(scope.row)" v-if="scope.row.status == '未审核'"
               >修改</el-button
             >
             <el-button
@@ -159,6 +159,7 @@ export default {
         // 其他记录...
       ],
       modalType: 0, //0 新增的弹窗 1 修改的弹窗
+      row_id: 0,//修改的行的id 用于修改
       //
 
       // total: 0, //当前总条数
@@ -269,7 +270,7 @@ export default {
             //id,weekNumber,sessionNumber,labNumber,applicationReason
             this.$api
               .student_loan_put(
-                this.form.id,
+                this.row_id,
                 this.form.weekNumber,
                 this.form.sessionNumber,
                 this.form.labNumber,
@@ -305,10 +306,12 @@ export default {
     handleEdit(row) {
       this.modalType = 1;
       this.dialogVisible = true;
+      this.row_id = row.id;
       // 要对当前行数据进行深拷贝
       this.form = JSON.parse(JSON.stringify(row));
     },
     handleDelete(row) {
+      alert(1)
       this.$api
         .student_loan_id(row.id)
         .then((result) => {

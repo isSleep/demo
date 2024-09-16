@@ -9,7 +9,7 @@ import axios from './axios'
 // 登陆接口
 export const login = (username, password) => {
     return axios({
-        url: '/login_mock',
+        url: '/login',
         method: 'get',
         params: { username, password }
     })
@@ -27,7 +27,7 @@ export const login = (username, password) => {
 //获取当前学期数据
 export const common_semester = () => {
     return axios({
-        url: '/common/semester_mock',
+        url: '/common/semester',
         method: 'get'
     })
 }
@@ -47,7 +47,14 @@ export const common_class = week => {
         params: {week}
     })
 }
-
+//获取当前登陆用户
+export const common_user = data =>{
+    return axios({
+        url: '/common/user',
+        method: 'get',
+        data
+    })
+}
 //学生接口
 //借用实验室
 export const student_loan_post = (weekNumber,sessionNumber,labNumber,applicationReason) => {
@@ -81,7 +88,8 @@ export const student_loan_put = (id,weekNumber,sessionNumber,labNumber,applicati
 export const student_loan_id = (id) => {
     return axios({
         url: `/student/loan/${id}`,
-        method: 'put'
+        method: 'put',
+        data
     })
 }
 
@@ -96,22 +104,32 @@ export const technician_equip_get = data => {
 }
 
 //修改报修状态
-export const technician_equip_put = data => {
+export const technician_equip_put = (id,status) => {
     return axios({
         url: '/technician/equip',
         method: 'put',
-        data
+        params: {id,status}
     })
 }
+
+//填写维修情况说明
+export const technician_equip_update = (id,content) => {
+    return axios({
+        url: '/technician/equip/update',
+        method: 'put',
+        params: {id,content}
+    })
+}
+
 
 //教师
 //实验室申请
 //新增申请
-export const teacher_experiment_post = data => {
+export const teacher_experiment_post = (courseName,labType,studentClass,studentCount,startWeek,endWeek,sessionNumber) => {
     return axios({
         url: '/teacher/experiment',
         method: 'post',
-        data
+        data:{courseName,labType,studentClass,studentCount,startWeek,endWeek,sessionNumber}
     })
 }
 
@@ -125,21 +143,21 @@ export const teacher_experiment_get = data => {
 }
 
 //修改未排课的申请
-export const teacher_experiment_put = data => {
+export const teacher_experiment_put = (id,courseName,labType,studentClass,studentCount,startWeek,endWeek,sessionNumber) => {
     return axios({
         url: '/teacher/experiment',
         method: 'put',
-        data
+        data: {id,courseName,labType,studentClass,studentCount,startWeek,endWeek,sessionNumber}
     })
 }
 
 //实验室设备保修
 //新增报修
-export const teacher_device_post = data => {
+export const teacher_device_post = (labNumber,faultDescription) => {
     return axios({
         url: '/teacher/device',
         method: 'post',
-        data
+        data:{labNumber,faultDescription}
     })
 }
 
@@ -213,47 +231,52 @@ export const admin_user_get = (role,page,pageSize,name) => {
 }
 
 //删除用户信息
-export const admin_user_delete = data => {
+export const admin_user_delete = (userId) => {
     return axios({
         url: '/admin/user',
         method: 'delete',
-        data
+        params:{userId}
     })
 }
 
 //重置密码
-export const admin_reset = data => {
+export const admin_reset = (userId) => {
     return axios({
-        url: '/admin/reset',
+        url: '/admin/user/reset',
         method: 'put',
-        data
+        params:{userId}
     })
 }
 
 //新增用户信息
-export const admin_user_post = data => {
+export const admin_user_post = (id,username,password,name,role,title,major,classes) => {
     return axios({
         url: '/admin/user',
         method: 'post',
-        data
+        data:{id,username,password,name,role,title,major,classes}
     })
 }
 
 //更新用户信息
-export const admin_user_put = data => {
+export const admin_user_put = (id,username,password,name,role,title,major,classes) => {
     return axios({
         url: '/admin/user',
         method: 'put',
-        data
+        data:{id,username,password,name,role,title,major,classes}
     })
 }
 
 //excel文件批量导入
-export const admin_user_upload = data => {
+export const admin_user_upload = (file) => {
     return axios({
         url: '/admin/user/upload',
         method: 'post',
-        data
+        transformRequest: [function(data, headers) {
+            // 去除post请求默认的Content-Type
+            delete headers.post['Content-Type']
+            return data
+          }],
+        data: {file}
     })
 }
 
@@ -262,7 +285,7 @@ export const admin_user_upload = data => {
 export const admin_classes_id = (id) => {
     
     return axios({
-        url: `/admin/fuck/${id}`,
+        url: `/admin/classes/${id}`,
         //url: '/admin/classes/${id}', // 使用反引号和 ${} 来插入变量
         method: 'get'
     })
@@ -278,11 +301,11 @@ export const admin_classes_get = data => {
 }
 
 //完成排课
-export const admin_classes_put = data => {
+export const admin_classes_put = (registrationId,labId) => {
     return axios({
         url: '/admin/classes',
         method: 'put',
-        data
+        params: {registrationId,labId}
     })
 }
 
@@ -301,7 +324,7 @@ export const admin_loan_put = (id, status) => {
     return axios({
         url: '/admin/loan',
         method: 'put',
-        params: { id, password }
+        params: { id, status }
     })
 }
 
@@ -310,12 +333,14 @@ export default {
     common_semester,
     common_laboratory,
     common_class,
+    common_user,
     student_loan_post,
     student_loan_get,
-    student_loan_id,
     student_loan_put,
+    student_loan_id,
     technician_equip_get,
     technician_equip_put,
+    technician_equip_update,
     teacher_experiment_post,
     teacher_experiment_get,
     teacher_experiment_put,
